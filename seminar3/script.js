@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 //task 1
 
@@ -27,38 +27,46 @@
 // Для того щоб відправити запит, зареєструйтеся на платформі openweathermap.org та створіть собі ключ, або скористайтеся цим:
 // $api_key = 35b4e8effcc623676e7574df04d98811;
 
+const root = document.querySelector("body");
+let forecastSearchInput = document.querySelector("#forecast-search");
+let searchBtn = document.querySelector("#search-btn");
+const weatherInfoContainer = document.createElement("div");
 
-const root = document.querySelector('body');
-let forecastSearchInput = document.querySelector('#forecast-search');
-let searchBtn = document.querySelector('#search-btn');
-
-searchBtn.addEventListener('click', getForecast);
+searchBtn.addEventListener("click", getForecast);
 
 async function getForecast() {
-    const url =  'https://api.openweathermap.org/data/2.5/forecast';
-    const apiKey = '35b4e8effcc623676e7574df04d98811';
-    
-    if (forecastSearchInput.value !== '') {
-        let city = forecastSearchInput.value;
-
-        let request = await fetch(`${url}?appid=${apiKey}&lang=ua&units=metric&q=${city}`);
-    
-        if (request.ok) {
-            const data = await request.json();
-            console.log(data);
-            const temp = Math.round(data.list[0]['main']['temp']);
-            console.log(temp);
-            const weather = data.list[0]['weather'][0]['main'];
-            console.log(weather);
-    
-            const weatherInfoContainer = document.createElement('div');
-            weatherInfoContainer.textContent = `City: ${city}. Temperature ${temp} C. Weather ${weather}`;
-            root.append(weatherInfoContainer);
+  const url = "https://api.openweathermap.org/data/2.5/forecast";
+  const apiKey = "35b4e8effcc623676e7574df04d98811";
 
 
-        }
+  if (forecastSearchInput.value !== "") {
+    let city = forecastSearchInput.value;
+
+   
+    // weatherInfoContainer.textContent = "";
+
+    try {
+      let request = await fetch(
+        `${url}?appid=${apiKey}&lang=ua&units=metric&q=${city}`
+      );
+
+      if (request.ok) {
+        const data = await request.json();
+        const temp = Math.round(data.list[0]["main"]["temp"]);
+        const weather = data.list[0]["weather"][0]["main"];
+
+        weatherInfoContainer.textContent = `City: ${city}. Temperature: ${temp} C. Weather: ${weather}`;
+       
+      } else {
+        throw new Error(request.status);
+      }
+    } catch (error) {
+      if (error.message === "404") {
+        weatherInfoContainer.textContent = "City had not found";
+      }
     }
-    
+    forecastSearchInput.value = "";
+    root.append(weatherInfoContainer);
+  }
+
 }
-
-
